@@ -71,9 +71,20 @@ public class MainActivity extends AppCompatActivity {
 
 
                 }
+            });
+        t.start();
+        try{
+            t.join();
+        } catch (InterruptedException e){
+            e.printStackTrace();
+        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                outputText.setText(response);
             }
-        })
+        });
+        }
     }
 
 
-}
