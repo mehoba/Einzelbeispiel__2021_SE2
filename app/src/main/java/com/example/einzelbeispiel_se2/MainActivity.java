@@ -16,8 +16,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
-    private Button sendButton;
-    private TextView MNrText,outputText;
+    private Button sendButton, aufgabeButton;
+    private TextView MNrText,outputText, arrayOuput;
     private EditText MNrInput;
     private Socket socket;
     private BufferedReader br;
@@ -33,6 +33,17 @@ public class MainActivity extends AppCompatActivity {
         MNrInput= findViewById(R.id.MNrInput);
         MNrText = findViewById(R.id.MNrText);
         outputText=findViewById(R.id.outputText);
+        aufgabeButton= findViewById(R.id.aufgabeButton);
+        /*aufgabeButton.setVisibility(View.INVISIBLE);*/
+        arrayOuput= findViewById(R.id.arrayOutput);
+
+        aufgabeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                arrayOuput.setText(printArray(setArray(MNrInput.getText().toString())));
+
+            }
+        });
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else
                 {
+                    sendMessage(MNrInput.getText().toString());
+                  /*  aufgabeButton.setVisibility(View.VISIBLE);*/
 
                 }
             }
@@ -85,6 +98,68 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         }
+
+
+
+        private int [] sortArray(int [] a){
+        for(int i=1; i<a.length; i++){
+            if(a[i]<a[i-1]){
+                int temp=a[i];
+                a[i]= a[i-1];
+                a[i-1]= temp;
+                sortArray(a);
+            }
+        }
+            return a;
+        }
+
+    private int[] setArray(String s){
+        int counter=0;
+        String [] numStr = s.split("");
+        int [] num = new int [numStr.length];
+        for(int i=0; i<num.length;i++){
+            if(checkIfPrime(Integer.parseInt(numStr[i]))==true){
+                num[i]=0;
+                counter++;
+            }
+            else{
+            num[i]= Integer.parseInt(numStr[i]);}
+        }
+
+        int [] noPrime = new int[num.length-counter];
+        counter=0;
+        for(int i=0; i<num.length; i++){
+            if(num[i] != 0){
+                noPrime[counter]=num[i];
+                counter++;
+        }}
+       return sortArray(noPrime);
     }
+
+
+    private boolean checkIfPrime(int n){
+        if(n==0 || n==1 || n==2){
+            return true;
+        }
+      
+        for(int i=2; i<n;i++){
+            if(n%i == 0){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String printArray(int []a){
+        String s="";
+        for(int i=0; i<a.length;i++){
+            s=s+" "+a[i];
+        }
+        return s;
+    }
+    }
+
+
+
 
 
