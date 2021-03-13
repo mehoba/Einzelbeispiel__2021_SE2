@@ -9,9 +9,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -20,10 +23,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView MNrText,outputText, arrayOuput;
     private EditText MNrInput;
     private Socket socket;
-    private BufferedReader br;
-    private PrintWriter pw;
+    private BufferedReader inFromServer, inFromUser;
     private OutputStream os;
     private String response;
+    private InputStream is;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +74,20 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 try {
                     socket= new Socket("se2-isys.aau.at", 53212);
-                    os= socket.getOutputStream();
-                    pw= new PrintWriter(os,true);
-                    pw.println(msg);
-                    pw.flush();
+                    PrintStream out = new PrintStream(socket.getOutputStream());
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    out.println(msg);
 
-                    br= new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    response= br.readLine();
+                    response= in.readLine();
+                    while ( response != null){
+                        outputText.setText(response);
+                        response= in.readLine();
+                    }
+
+                    in.close();
+                    out.close();
+                    socket.close();
+                    
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -85,18 +95,14 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
+
         t.start();
         try{
             t.join();
         } catch (InterruptedException e){
             e.printStackTrace();
         }
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                outputText.setText(response);
-            }
-        });
+
         }
 
 
@@ -141,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         if(n==0 || n==1 || n==2){
             return true;
         }
-      
+
         for(int i=2; i<n;i++){
             if(n%i == 0){
                 return false;
